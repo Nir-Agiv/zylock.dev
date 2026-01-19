@@ -1,154 +1,109 @@
-🧠 HERO SECTION (Above the Fold)
-Headline
-
-Identity-Aware VPN. Full Visibility. Self-Hosted.
-
-Sub-headline
-
-Zylock is a self-hosted WireGuard VPN replacement that ties every connection to a real user, enables instant revocation, and produces audit-ready logs — without SaaS lock-in.
-
-Primary CTA
-
-Request Early Access
-(or: Download & Try (Free up to 10 users))
-
-Secondary CTA (smaller)
-
-Read the docs →
-
-🔍 THE PROBLEM
-Legacy VPNs Don’t Know Who Is Connected
-
-Traditional VPNs authenticate devices or shared credentials — not people.
-
-This leads to:
-
-No clear accountability
-
-Slow or impossible access revocation
-
-Painful audits
-
-Lingering access after offboarding
-
-Security teams are left asking:
-
-“Who is actually on our network right now?”
-
-🔐 THE ZYLOCK SOLUTION
-Identity-Aware Access, Without SaaS Dependency
-
-Zylock replaces legacy VPNs with identity-bound network access.
-
-Every connection is:
-
-Authenticated via SSO (OIDC)
-
-Tied to a specific user and device
-
-Logged immutably
-
-Revocable instantly
-
-All deployed as a single self-hosted binary.
-
-⚙️ HOW IT WORKS (Simple, Clear)
-
-User logs in with SSO (Google today, more coming)
-
-Admin approves access (JIT provisioning)
-
-Device receives a certificate (mTLS)
-
-WireGuard tunnel is established
-
-All activity is logged and attributable
-
-No shared credentials.
-No anonymous tunnels.
-
-✅ WHAT YOU GET
-Identity & Control
-
-SSO / OIDC authentication
-
-Admin approval workflow
-
-Immediate session revocation
-
-Device-bound certificates (mTLS)
-
-Visibility & Compliance
-
-Immutable audit logs
-
-User, device, IP, and session tracking
-
-SOC2 / ISO-friendly evidence
-
-Operational Simplicity
-
-Single binary deployment
-
-Embedded UI (no external dependencies)
-
-Works in air-gapped environments
-
-WireGuard performance
-
-🚫 WHAT ZYLOCK DOES NOT DO (HONESTY BUILDS TRUST)
-
-Zylock does not:
-
-Replace application authentication
-
-Enforce file-level permissions
-
-Act as an application proxy
-
-Zylock controls who gets on the network.
-Your systems control what they can do.
-
-🎯 WHO IT’S FOR
-
-Security-conscious SMBs (10–300 users)
-
-Regulated environments
-
-On-prem / hybrid infrastructure
-
-Teams that want control, not SaaS lock-in
-
-Not designed for:
-
-Zero-infrastructure startups
-
-App-level ZTNA use cases (yet)
-
-💰 LICENSING (KEEP THIS LIGHT)
-Simple Annual Licensing
-
-Free up to 10 users
-
-Paid plans starting around $180/user/year
-
-Enterprise licensing available
-
-Self-hosted. No per-connection fees. No data leaving your network.
-
-👉 Request pricing / early access
-
-🧩 DIFFERENTIATION (OPTIONAL SECTION)
-Feature	Zylock	SaaS ZTNA	Legacy VPN
-Identity-aware	✅	✅	❌
-Self-hosted	✅	❌	✅
-Instant revocation	✅	⚠️	❌
-Audit-ready logs	✅	⚠️	❌
-WireGuard speed	✅	⚠️	❌
-📣 FINAL CTA
-Take Back Control of Network Access
-
-Deploy Zylock in minutes and know exactly who is connected, from where, and why.
-
-Get Early Access
-Read the Documentation
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zylock — Identity-Aware VPN</title>
+  <meta name="description" content="Zylock is a self-hosted, identity-aware VPN replacement with instant revocation and audit-ready logs." />
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 0;
+      color: #111;
+      background: #fff;
+      line-height: 1.6;
+    }
+    header, section {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 64px 24px;
+    }
+    header {
+      padding-top: 96px;
+    }
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 16px;
+    }
+    h2 {
+      font-size: 2rem;
+      margin-top: 64px;
+    }
+    p {
+      font-size: 1.1rem;
+      max-width: 700px;
+    }
+    .cta {
+      display: inline-block;
+      margin-top: 24px;
+      padding: 12px 20px;
+      background: #111;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+    .muted {
+      color: #555;
+    }
+    footer {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 48px 24px;
+      border-top: 1px solid #eee;
+      font-size: 0.9rem;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Identity-Aware VPN.<br>Full Visibility. Self-Hosted.</h1>
+  <p>
+    Zylock is a self-hosted WireGuard VPN replacement that ties every connection
+    to a real user, enables instant revocation, and produces audit-ready logs —
+    without SaaS lock-in.
+  </p>
+  <a class="cta" href="https://github.com/nir-agiv/zylock.dev">Request Early Access</a>
+</header>
+
+<section>
+  <h2>The Problem</h2>
+  <p>
+    Traditional VPNs authenticate devices or shared credentials — not people.
+    This creates blind spots, weak offboarding, and painful audits.
+  </p>
+</section>
+
+<section>
+  <h2>The Zylock Solution</h2>
+  <p>
+    Zylock binds identity, device, and session into a single control plane.
+    Every connection is attributable, revocable, and logged.
+  </p>
+</section>
+
+<section>
+  <h2>What Zylock Does</h2>
+  <p>
+    Zylock controls who can access your private network using SSO, mTLS, and
+    WireGuard. Your existing systems continue to control application permissions.
+  </p>
+</section>
+
+<section>
+  <h2>Licensing</h2>
+  <p>
+    Free for up to 10 users. Paid annual licenses for teams that need audit
+    retention, compliance, and support.
+  </p>
+</section>
+
+<footer>
+  © 2026 Zylock Security · Self-hosted · No SaaS lock-in
+</footer>
+
+</body>
+</html>
