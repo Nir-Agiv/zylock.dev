@@ -143,47 +143,121 @@
         </div>
     </section>
 
-    <!-- Comparison Table -->
-    <section id="comparison" class="py-20 bg-slate-900">
-        <div class="max-w-5xl mx-auto px-4">
-            <h2 class="text-3xl font-bold text-center text-white mb-12">Why Zylock?</h2>
+<!-- Comparison Table -->
+    <section id="comparison" class="py-24 bg-slate-900 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-white">Choose Your Architecture</h2>
+                <p class="mt-4 text-slate-400">Why teams are moving away from both SaaS rental and legacy hardware.</p>
+            </div>
+
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
+                <table class="w-full text-left border-collapse min-w-[800px]">
                     <thead>
                         <tr>
-                            <th class="p-4 border-b border-slate-700 text-slate-400 font-normal">Feature</th>
-                            <th class="p-4 border-b border-slate-700 text-brand-accent font-bold text-lg">Zylock</th>
-                            <th class="p-4 border-b border-slate-700 text-slate-500">Tailscale</th>
-                            <th class="p-4 border-b border-slate-700 text-slate-500">OpenVPN</th>
+                            <th class="p-6 border-b border-slate-700 w-1/4"></th>
+                            <!-- Zylock Column (Highlighted) -->
+                            <th class="p-6 border-b border-brand-accent/30 bg-brand-accent/5 rounded-t-xl w-1/4 relative">
+                                <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand-accent text-brand-dark text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                                    Your Choice
+                                </div>
+                                <div class="text-2xl font-bold text-white">Zylock</div>
+                                <div class="text-sm text-brand-accent mt-1">Modern Self-Hosted</div>
+                            </th>
+                            <!-- SaaS Column -->
+                            <th class="p-6 border-b border-slate-700 w-1/4">
+                                <div class="text-xl font-semibold text-slate-300">SaaS ZTNA</div>
+                                <div class="text-sm text-slate-500 mt-1">Vendor Cloud</div>
+                            </th>
+                            <!-- Legacy Column -->
+                            <th class="p-6 border-b border-slate-700 w-1/4">
+                                <div class="text-xl font-semibold text-slate-300">Legacy VPN</div>
+                                <div class="text-sm text-slate-500 mt-1">The "Castle" Model</div>
+                            </th>
                         </tr>
                     </thead>
-                    <tbody class="text-slate-300">
+                    <tbody class="divide-y divide-slate-800">
+                        <!-- Row 1: Data Sovereignty -->
                         <tr>
-                            <td class="p-4 border-b border-slate-800">Deployment</td>
-                            <td class="p-4 border-b border-slate-800 font-semibold text-white">Self-Hosted Single Binary</td>
-                            <td class="p-4 border-b border-slate-800">SaaS Controlled</td>
-                            <td class="p-4 border-b border-slate-800">Complex Config</td>
+                            <td class="p-6 text-slate-400 font-medium">Control Plane Location</td>
+                            <td class="p-6 bg-brand-accent/5 border-x border-brand-accent/10 text-white font-semibold">
+                                🏠 Your Server
+                                <div class="text-xs text-slate-400 font-normal mt-1">100% Data Ownership</div>
+                            </td>
+                            <td class="p-6 text-slate-400">
+                                ☁️ Vendor Cloud
+                                <div class="text-xs text-slate-600 mt-1">Metadata leaks externally</div>
+                            </td>
+                            <td class="p-6 text-slate-400">
+                                🏢 On-Prem
+                                <div class="text-xs text-slate-600 mt-1">Requires heavy appliances</div>
+                            </td>
                         </tr>
+
+                        <!-- Row 2: Identity -->
                         <tr>
-                            <td class="p-4 border-b border-slate-800">Identity</td>
-                            <td class="p-4 border-b border-slate-800 font-semibold text-white">OIDC / SSO</td>
-                            <td class="p-4 border-b border-slate-800">OIDC / SSO</td>
-                            <td class="p-4 border-b border-slate-800">Certificates / LDAP</td>
+                            <td class="p-6 text-slate-400 font-medium">Authentication</td>
+                            <td class="p-6 bg-brand-accent/5 border-x border-brand-accent/10 text-brand-success font-semibold">
+                                ✅ OIDC / SSO
+                            </td>
+                            <td class="p-6 text-slate-300">
+                                ✅ OIDC / SSO
+                            </td>
+                            <td class="p-6 text-slate-500">
+                                ❌ LDAP / Shared Keys
+                            </td>
                         </tr>
+
+                        <!-- Row 3: Deployment -->
                         <tr>
-                            <td class="p-4 border-b border-slate-800">Protocol</td>
-                            <td class="p-4 border-b border-slate-800 font-semibold text-white">WireGuard</td>
-                            <td class="p-4 border-b border-slate-800">WireGuard</td>
-                            <td class="p-4 border-b border-slate-800">OpenVPN (Slow)</td>
+                            <td class="p-6 text-slate-400 font-medium">Installation</td>
+                            <td class="p-6 bg-brand-accent/5 border-x border-brand-accent/10 text-white">
+                                <span class="border-b border-dotted border-slate-500 cursor-help" title="Go binary with embedded assets">Single Binary</span>
+                            </td>
+                            <td class="p-6 text-slate-400">
+                                Agent + Cloud Acct
+                            </td>
+                            <td class="p-6 text-slate-500">
+                                Complex Appliance
+                            </td>
                         </tr>
+
+                        <!-- Row 4: Visibility -->
                         <tr>
-                            <td class="p-4 border-b border-slate-800">Audit Data</td>
-                            <td class="p-4 border-b border-slate-800 font-semibold text-white">You own it (SQLite)</td>
-                            <td class="p-4 border-b border-slate-800">They own it</td>
-                            <td class="p-4 border-b border-slate-800">Text files</td>
+                            <td class="p-6 text-slate-400 font-medium">Audit Visibility</td>
+                            <td class="p-6 bg-brand-accent/5 border-x border-brand-accent/10 text-white">
+                                User + Device + IP
+                            </td>
+                            <td class="p-6 text-slate-400">
+                                User + IP
+                            </td>
+                            <td class="p-6 text-slate-500">
+                                IP Only (Blind)
+                            </td>
+                        </tr>
+
+                        <!-- Row 5: Protocol/Speed -->
+                        <tr>
+                            <td class="p-6 text-slate-400 font-medium">Protocol</td>
+                            <td class="p-6 bg-brand-accent/5 border-x border-brand-accent/10 text-white rounded-b-xl border-b border-brand-accent/30">
+                                ⚡ WireGuard
+                            </td>
+                            <td class="p-6 text-slate-400">
+                                ⚡ WireGuard / Proprietary
+                            </td>
+                            <td class="p-6 text-slate-500">
+                                🐌 IPsec / OpenVPN
+                            </td>
                         </tr>
                     </tbody>
                 </table>
+            </div>
+
+            <!-- DIY Callout -->
+            <div class="mt-8 text-center">
+                <p class="text-slate-500 text-sm">
+                    <strong>Thinking about DIY Open Source?</strong> Raw WireGuard is fast, but managing keys and config files for a whole team is a nightmare. Zylock gives you the UI and SSO you're missing.
+                </p>
             </div>
         </div>
     </section>
