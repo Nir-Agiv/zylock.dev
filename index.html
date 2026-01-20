@@ -1,109 +1,206 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Zylock — Identity-Aware VPN</title>
-  <meta name="description" content="Zylock is a self-hosted, identity-aware VPN replacement with instant revocation and audit-ready logs." />
-  <style>
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      margin: 0;
-      padding: 0;
-      color: #111;
-      background: #fff;
-      line-height: 1.6;
-    }
-    header, section {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 64px 24px;
-    }
-    header {
-      padding-top: 96px;
-    }
-    h1 {
-      font-size: 3rem;
-      margin-bottom: 16px;
-    }
-    h2 {
-      font-size: 2rem;
-      margin-top: 64px;
-    }
-    p {
-      font-size: 1.1rem;
-      max-width: 700px;
-    }
-    .cta {
-      display: inline-block;
-      margin-top: 24px;
-      padding: 12px 20px;
-      background: #111;
-      color: #fff;
-      text-decoration: none;
-      border-radius: 6px;
-      font-weight: 600;
-    }
-    .muted {
-      color: #555;
-    }
-    footer {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 48px 24px;
-      border-top: 1px solid #eee;
-      font-size: 0.9rem;
-      color: #666;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zylock | Identity-Aware Secure Remote Access</title>
+    <meta name="description" content="Self-hosted VPN replacement. Single binary. WireGuard speed. Enterprise visibility.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            dark: '#0f172a',
+                            accent: '#38bdf8', // Light Blue
+                            success: '#22c55e', // Green
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #0f172a; color: #e2e8f0; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+        .glow-text { text-shadow: 0 0 20px rgba(56, 189, 248, 0.5); }
+    </style>
 </head>
-<body>
+<body class="antialiased selection:bg-brand-accent selection:text-brand-dark">
 
-<header>
-  <h1>Identity-Aware VPN.<br>Full Visibility. Self-Hosted.</h1>
-  <p>
-    Zylock is a self-hosted WireGuard VPN replacement that ties every connection
-    to a real user, enables instant revocation, and produces audit-ready logs —
-    without SaaS lock-in.
-  </p>
-  <a class="cta" href="https://github.com/nir-agiv/zylock.dev">Request Early Access</a>
-</header>
+    <!-- Navbar -->
+    <nav class="fixed w-full z-50 glass border-b border-slate-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-2xl font-bold text-white tracking-tighter">ZYLOCK<span class="text-brand-accent">.</span></span>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="#features" class="hover:text-brand-accent transition">Features</a>
+                        <a href="#how-it-works" class="hover:text-brand-accent transition">How it Works</a>
+                        <a href="#comparison" class="hover:text-brand-accent transition">Comparison</a>
+                        <a href="https://github.com/yourusername/zylock" class="bg-brand-accent text-brand-dark px-4 py-2 rounded-md font-bold hover:bg-white transition">Get Started</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
 
-<section>
-  <h2>The Problem</h2>
-  <p>
-    Traditional VPNs authenticate devices or shared credentials — not people.
-    This creates blind spots, weak offboarding, and painful audits.
-  </p>
-</section>
+    <!-- Hero Section -->
+    <section class="pt-32 pb-20 px-4 text-center">
+        <div class="max-w-4xl mx-auto">
+            <div class="inline-block px-3 py-1 mb-6 text-xs font-semibold tracking-wider text-brand-accent uppercase bg-slate-800 rounded-full border border-slate-700">
+                v1.0 Now Available
+            </div>
+            <h1 class="text-5xl md:text-7xl font-bold text-white mb-6 tracking-tight">
+                Stop Trusting IPs.<br>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-accent to-blue-600 glow-text">Start Trusting Identities.</span>
+            </h1>
+            <p class="mt-4 text-xl text-slate-400 max-w-2xl mx-auto">
+                Zylock is the self-hosted VPN replacement that knows <strong>who</strong> is connecting, not just <strong>what</strong>. Single binary. WireGuard speed. SOC2-ready visibility.
+            </p>
+            <div class="mt-10 flex justify-center gap-4">
+                <a href="https://github.com/yourusername/zylock" class="px-8 py-3 bg-brand-accent text-brand-dark font-bold rounded-lg hover:bg-white transition shadow-[0_0_20px_rgba(56,189,248,0.3)]">
+                    Download Binary
+                </a>
+                <a href="#how-it-works" class="px-8 py-3 bg-slate-800 text-white font-semibold rounded-lg hover:bg-slate-700 border border-slate-600 transition">
+                    How It Works
+                </a>
+            </div>
+            <div class="mt-12 text-sm text-slate-500 font-mono">
+                <span class="mx-2">✓ Linux Server</span>
+                <span class="mx-2">✓ Windows Client</span>
+                <span class="mx-2">✓ OIDC Ready</span>
+            </div>
+        </div>
+    </section>
 
-<section>
-  <h2>The Zylock Solution</h2>
-  <p>
-    Zylock binds identity, device, and session into a single control plane.
-    Every connection is attributable, revocable, and logged.
-  </p>
-</section>
+    <!-- Value Prop Grid -->
+    <section id="features" class="py-20 bg-slate-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Card 1 -->
+                <div class="glass p-8 rounded-2xl hover:border-brand-accent/50 transition duration-300">
+                    <div class="text-brand-accent text-3xl mb-4">🛡️</div>
+                    <h3 class="text-xl font-bold text-white mb-2">Identity-First Security</h3>
+                    <p class="text-slate-400">Replace shared keys with OIDC/SSO (Google, Okta, Azure). Approve users via admin dashboard before they connect.</p>
+                </div>
+                <!-- Card 2 -->
+                <div class="glass p-8 rounded-2xl hover:border-brand-accent/50 transition duration-300">
+                    <div class="text-brand-accent text-3xl mb-4">⚡</div>
+                    <h3 class="text-xl font-bold text-white mb-2">WireGuard Speed</h3>
+                    <p class="text-slate-400">Modern kernel-space cryptography. High throughput, low latency, and resistant to network scanning.</p>
+                </div>
+                <!-- Card 3 -->
+                <div class="glass p-8 rounded-2xl hover:border-brand-accent/50 transition duration-300">
+                    <div class="text-brand-accent text-3xl mb-4">👁️</div>
+                    <h3 class="text-xl font-bold text-white mb-2">Audit & Compliance</h3>
+                    <p class="text-slate-400">Immutable append-only logs. Know exactly who accessed what, when they logged in, and when they were revoked.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-<section>
-  <h2>What Zylock Does</h2>
-  <p>
-    Zylock controls who can access your private network using SSO, mTLS, and
-    WireGuard. Your existing systems continue to control application permissions.
-  </p>
-</section>
+    <!-- Architecture/How It Works -->
+    <section id="how-it-works" class="py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-white">Traditional VPN vs. Zylock</h2>
+                <p class="mt-4 text-slate-400">The "Bouncer" for your private network.</p>
+            </div>
+            
+            <div class="relative">
+                <div class="absolute inset-0 flex items-center" aria-hidden="true">
+                    <div class="w-full border-t border-slate-700"></div>
+                </div>
+            </div>
 
-<section>
-  <h2>Licensing</h2>
-  <p>
-    Free for up to 10 users. Paid annual licenses for teams that need audit
-    retention, compliance, and support.
-  </p>
-</section>
+            <div class="mt-12 grid grid-cols-1 gap-8 md:grid-cols-2">
+                <!-- Old Way -->
+                <div class="bg-red-900/10 border border-red-900/30 p-6 rounded-xl">
+                    <h3 class="text-red-400 font-bold text-lg mb-2">❌ Legacy VPN</h3>
+                    <ul class="space-y-3 text-slate-400">
+                        <li class="flex items-start"><span class="mr-2">⚠</span> "Here is a key, you are now trusted forever."</li>
+                        <li class="flex items-start"><span class="mr-2">⚠</span> Logs show IP addresses, not names.</li>
+                        <li class="flex items-start"><span class="mr-2">⚠</span> Revocation is manual and difficult.</li>
+                    </ul>
+                </div>
 
-<footer>
-  © 2026 Zylock Security · Self-hosted · No SaaS lock-in
-</footer>
+                <!-- Zylock Way -->
+                <div class="bg-green-900/10 border border-green-900/30 p-6 rounded-xl">
+                    <h3 class="text-brand-success font-bold text-lg mb-2">✅ The Zylock Way</h3>
+                    <ul class="space-y-3 text-slate-300">
+                        <li class="flex items-start"><span class="mr-2 text-brand-success">✓</span> User logs in via SSO (MFA enforced by IDP).</li>
+                        <li class="flex items-start"><span class="mr-2 text-brand-success">✓</span> Device authenticates via mTLS certificates.</li>
+                        <li class="flex items-start"><span class="mr-2 text-brand-success">✓</span> Admin can kill sessions instantly.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Comparison Table -->
+    <section id="comparison" class="py-20 bg-slate-900">
+        <div class="max-w-5xl mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center text-white mb-12">Why Zylock?</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr>
+                            <th class="p-4 border-b border-slate-700 text-slate-400 font-normal">Feature</th>
+                            <th class="p-4 border-b border-slate-700 text-brand-accent font-bold text-lg">Zylock</th>
+                            <th class="p-4 border-b border-slate-700 text-slate-500">Tailscale</th>
+                            <th class="p-4 border-b border-slate-700 text-slate-500">OpenVPN</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-slate-300">
+                        <tr>
+                            <td class="p-4 border-b border-slate-800">Deployment</td>
+                            <td class="p-4 border-b border-slate-800 font-semibold text-white">Self-Hosted Single Binary</td>
+                            <td class="p-4 border-b border-slate-800">SaaS Controlled</td>
+                            <td class="p-4 border-b border-slate-800">Complex Config</td>
+                        </tr>
+                        <tr>
+                            <td class="p-4 border-b border-slate-800">Identity</td>
+                            <td class="p-4 border-b border-slate-800 font-semibold text-white">OIDC / SSO</td>
+                            <td class="p-4 border-b border-slate-800">OIDC / SSO</td>
+                            <td class="p-4 border-b border-slate-800">Certificates / LDAP</td>
+                        </tr>
+                        <tr>
+                            <td class="p-4 border-b border-slate-800">Protocol</td>
+                            <td class="p-4 border-b border-slate-800 font-semibold text-white">WireGuard</td>
+                            <td class="p-4 border-b border-slate-800">WireGuard</td>
+                            <td class="p-4 border-b border-slate-800">OpenVPN (Slow)</td>
+                        </tr>
+                        <tr>
+                            <td class="p-4 border-b border-slate-800">Audit Data</td>
+                            <td class="p-4 border-b border-slate-800 font-semibold text-white">You own it (SQLite)</td>
+                            <td class="p-4 border-b border-slate-800">They own it</td>
+                            <td class="p-4 border-b border-slate-800">Text files</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 border-t border-slate-800 text-center">
+        <div class="mb-4">
+            <span class="text-2xl font-bold text-white tracking-tighter">ZYLOCK<span class="text-brand-accent">.</span></span>
+        </div>
+        <p class="text-slate-500 mb-6">Secure Remote Access for the Modern Era.</p>
+        <div class="flex justify-center space-x-6 text-slate-400">
+            <a href="https://github.com/yourusername/zylock" class="hover:text-white">GitHub</a>
+            <a href="#" class="hover:text-white">Documentation</a>
+            <a href="mailto:support@zylock.dev" class="hover:text-white">Contact</a>
+        </div>
+        <p class="mt-8 text-xs text-slate-600">© 2025 Zylock Security. All rights reserved.</p>
+    </footer>
 
 </body>
 </html>
