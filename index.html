@@ -1,351 +1,1009 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zylock | Identity-Aware Secure Remote Access</title>
-    <meta name="description" content="Self-hosted VPN replacement. Single binary. WireGuard speed. Enterprise visibility.">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: {
-                        brand: {
-                            dark: '#0f172a',
-                            accent: '#38bdf8', // Light Blue
-                            success: '#22c55e', // Green
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    <meta name="description" content="Self-hosted VPN replacement that knows who is connecting. Single binary. WireGuard speed. Complete audit trail.">
+    <meta name="keywords" content="VPN, Zero Trust, WireGuard, self-hosted, identity, SSO, OIDC, mTLS, audit, security">
+    <link rel="canonical" href="https://zylock.dev">
     <style>
-        body { background-color: #0f172a; color: #e2e8f0; }
-        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
-        .glow-text { text-shadow: 0 0 20px rgba(56, 189, 248, 0.5); }
+        /* Reset and Base */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-tertiary: #1a1a24;
+            --text-primary: #f0f0f5;
+            --text-secondary: #a0a0b0;
+            --text-muted: #606070;
+            --accent: #3b82f6;
+            --accent-hover: #60a5fa;
+            --success: #22c55e;
+            --warning: #eab308;
+            --border: #2a2a35;
+            --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-mono: 'SF Mono', SFMono-Regular, ui-monospace, 'Cascadia Code', Consolas, monospace;
+        }
+        
+        html { scroll-behavior: smooth; }
+        
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* Typography */
+        h1, h2, h3, h4 { color: var(--text-primary); font-weight: 600; line-height: 1.2; }
+        h1 { font-size: clamp(2rem, 5vw, 3.5rem); }
+        h2 { font-size: clamp(1.5rem, 3vw, 2.25rem); margin-bottom: 1rem; }
+        h3 { font-size: 1.25rem; margin-bottom: 0.5rem; }
+        
+        a { color: var(--accent); text-decoration: none; transition: color 0.2s; }
+        a:hover { color: var(--accent-hover); }
+        
+        code, .mono { font-family: var(--font-mono); }
+        
+        /* Layout */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+        .section { padding: 5rem 0; }
+        .section-alt { background: var(--bg-secondary); }
+        
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(10, 10, 15, 0.9);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .nav-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 4rem;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+        }
+        
+        .logo span { color: var(--accent); }
+        
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            list-style: none;
+        }
+        
+        .nav-links a {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+        
+        .nav-links a:hover { color: var(--text-primary); }
+        
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--text-muted);
+            color: var(--text-primary);
+        }
+        
+        /* Hero */
+        .hero {
+            padding: 8rem 0 5rem;
+            text-align: center;
+        }
+        
+        .hero-badge {
+            display: inline-block;
+            padding: 0.4rem 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+        
+        .hero h1 { margin-bottom: 1.5rem; }
+        
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto 2.5rem;
+        }
+        
+        .hero-cta {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 3rem;
+        }
+        
+        .hero-features {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        
+        .hero-features span::before {
+            content: "✓ ";
+            color: var(--success);
+        }
+        
+        /* Problem/Solution */
+        .problem-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .problem-card, .solution-card {
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+        
+        .problem-card {
+            background: rgba(239, 68, 68, 0.05);
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+        
+        .solution-card {
+            background: rgba(34, 197, 94, 0.05);
+            border-color: rgba(34, 197, 94, 0.2);
+        }
+        
+        .problem-card h3 { color: #f87171; }
+        .solution-card h3 { color: var(--success); }
+        
+        .problem-card ul, .solution-card ul {
+            list-style: none;
+            margin-top: 1rem;
+        }
+        
+        .problem-card li, .solution-card li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        
+        .problem-card li::before {
+            content: "✕";
+            position: absolute;
+            left: 0;
+            color: #f87171;
+        }
+        
+        .solution-card li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--success);
+        }
+        
+        /* Features */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+        
+        .feature-card {
+            padding: 1.5rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            transition: border-color 0.2s;
+        }
+        
+        .feature-card:hover { border-color: var(--accent); }
+        
+        .feature-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+        }
+        
+        .feature-card p { font-size: 0.9rem; }
+        
+        /* How It Works */
+        .steps {
+            display: grid;
+            gap: 1rem;
+            margin-top: 3rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .step {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+        
+        .step-number {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--accent);
+            color: white;
+            border-radius: 50%;
+            font-size: 0.875rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        
+        .step-content h4 {
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .step-content p {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+        
+        /* Pricing */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .pricing-card {
+            padding: 2rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+        
+        .pricing-card.featured {
+            border-color: var(--accent);
+            position: relative;
+        }
+        
+        .pricing-card.featured::before {
+            content: "Production Ready";
+            position: absolute;
+            top: -0.75rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent);
+            color: white;
+            padding: 0.25rem 1rem;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .pricing-header {
+            text-align: center;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 1.5rem;
+        }
+        
+        .pricing-name {
+            font-size: 1.25rem;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .pricing-price {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .pricing-price span {
+            font-size: 1rem;
+            font-weight: 400;
+            color: var(--text-muted);
+        }
+        
+        .pricing-desc {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+        
+        .pricing-features {
+            list-style: none;
+        }
+        
+        .pricing-features li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            font-size: 0.9rem;
+        }
+        
+        .pricing-features li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--success);
+        }
+        
+        .pricing-note {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        
+        /* Comparison Table */
+        .table-wrapper {
+            overflow-x: auto;
+            margin-top: 3rem;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px;
+        }
+        
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        th {
+            color: var(--text-primary);
+            font-weight: 600;
+            background: var(--bg-tertiary);
+        }
+        
+        th:first-child { border-radius: 8px 0 0 0; }
+        th:last-child { border-radius: 0 8px 0 0; }
+        
+        td { font-size: 0.9rem; }
+        
+        .highlight-col {
+            background: rgba(59, 130, 246, 0.05);
+        }
+        
+        .check { color: var(--success); }
+        .cross { color: var(--text-muted); }
+        
+        /* Code Block */
+        .code-block {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+        
+        .code-block pre {
+            font-family: var(--font-mono);
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            white-space: pre;
+            line-height: 1.6;
+        }
+        
+        .code-block .comment { color: var(--text-muted); }
+        .code-block .command { color: var(--accent); }
+        .code-block .string { color: #a5d6ff; }
+        
+        /* Getting Started */
+        .quickstart {
+            max-width: 800px;
+            margin: 3rem auto 0;
+        }
+        
+        .quickstart h3 {
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .quickstart p {
+            margin-bottom: 1rem;
+        }
+        
+        /* Architecture */
+        .arch-diagram {
+            margin: 3rem auto;
+            max-width: 800px;
+            text-align: center;
+        }
+        
+        .arch-flow {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            padding: 2rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+        
+        .arch-box {
+            padding: 1rem 1.5rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .arch-box.user { border-color: var(--accent); }
+        .arch-box.zylock { border-color: var(--success); background: rgba(34, 197, 94, 0.1); }
+        .arch-box.resource { border-color: var(--warning); }
+        
+        .arch-arrow {
+            color: var(--text-muted);
+            font-size: 1.5rem;
+        }
+        
+        .arch-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+        
+        /* Footer */
+        footer {
+            padding: 4rem 0 2rem;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+        }
+        
+        .footer-links a {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .footer-copy {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 2rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .hero { padding-top: 6rem; }
+            .hero-cta { flex-direction: column; align-items: center; }
+            .hero-features { flex-direction: column; gap: 0.5rem; }
+            .arch-flow { flex-direction: column; }
+            .arch-arrow { transform: rotate(90deg); }
+            .section { padding: 3rem 0; }
+        }
+        
+        /* Security Highlights */
+        .security-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .security-item {
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.875rem;
+        }
+        
+        .security-item strong {
+            color: var(--text-primary);
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+        
+        /* Section headers */
+        .section-header {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        
+        .section-header p {
+            max-width: 600px;
+            margin: 0 auto;
+        }
     </style>
 </head>
-<body class="antialiased selection:bg-brand-accent selection:text-brand-dark">
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="container nav-inner">
+            <a href="/" class="logo">Zylock<span>.</span></a>
+            <ul class="nav-links">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#pricing">Pricing</a></li>
+                <li><a href="#quickstart">Get Started</a></li>
+                <li><a href="https://github.com/zylock-security/zylock">GitHub</a></li>
+                <li><a href="#quickstart" class="btn btn-primary">Download</a></li>
+            </ul>
+        </div>
+    </nav>
 
-    <!-- Navbar -->
-    <nav class="fixed w-full z-50 glass border-b border-slate-700">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex items-center">
-                    <span class="text-2xl font-bold text-white tracking-tighter">ZYLOCK<span class="text-brand-accent">.</span></span>
+    <!-- Hero -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-badge mono">v1.0 — Self-Hosted Zero Trust</div>
+            <h1>Identity-Aware Secure Remote Access</h1>
+            <p class="hero-subtitle">
+                Your VPN doesn't know <em>who</em> is connected. Zylock does.<br>
+                Single binary. WireGuard speed. Complete audit trail.
+            </p>
+            <div class="hero-cta">
+                <a href="#quickstart" class="btn btn-primary">Download Binary</a>
+                <a href="https://github.com/zylock-security/zylock" class="btn btn-secondary">View on GitHub</a>
+            </div>
+            <div class="hero-features">
+                <span>OIDC/SSO Integration</span>
+                <span>mTLS Device Trust</span>
+                <span>WireGuard Protocol</span>
+                <span>Air-Gap Ready</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Problem / Solution -->
+    <section class="section section-alt">
+        <div class="container">
+            <div class="section-header">
+                <h2>The Problem with Traditional VPNs</h2>
+                <p>Legacy VPNs are secure doors — anyone with the key can enter. Zylock is a secure door with a bouncer.</p>
+            </div>
+            <div class="problem-grid">
+                <div class="problem-card">
+                    <h3>Legacy VPN</h3>
+                    <ul>
+                        <li>"Here's a key, you're trusted forever"</li>
+                        <li>Logs show IP addresses, not identities</li>
+                        <li>Credential sharing is common</li>
+                        <li>Revocation is manual and slow</li>
+                        <li>No audit trail for compliance</li>
+                    </ul>
                 </div>
-                <div class="hidden md:block">
-                    <div class="ml-10 flex items-baseline space-x-8">
-                        <a href="#features" class="hover:text-brand-accent transition">Features</a>
-                        <a href="#how-it-works" class="hover:text-brand-accent transition">How it Works</a>
-                        <a href="#comparison" class="hover:text-brand-accent transition">Comparison</a>
-                        <a href="https://github.com/Nir-Agiv/zylock" class="bg-brand-accent text-brand-dark px-4 py-2 rounded-md font-bold hover:bg-white transition">Get Started</a>
+                <div class="solution-card">
+                    <h3>Zylock</h3>
+                    <ul>
+                        <li>Every session tied to a verified identity (SSO)</li>
+                        <li>Know exactly who accessed what, when</li>
+                        <li>Device-bound certificates (mTLS)</li>
+                        <li>Instant revocation from dashboard</li>
+                        <li>Immutable audit logs for SOC2/ISO 27001</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section id="features" class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Built for Security Teams</h2>
+                <p>Everything you need to replace your legacy VPN. Nothing you don't.</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">ID</div>
+                    <h3>Identity-First Access</h3>
+                    <p>OIDC/SSO integration with any provider (Google, Microsoft, Okta). Admin approval workflow. Know exactly who is connected.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">mTLS</div>
+                    <h3>Device Trust</h3>
+                    <p>Mutual TLS certificates bound to each device. Cryptographic device identity, not just network location.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">WG</div>
+                    <h3>WireGuard Speed</h3>
+                    <p>Modern kernel-space encryption. High throughput, low latency, resistant to network scanning.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">LOG</div>
+                    <h3>Audit Trail</h3>
+                    <p>Immutable append-only logs. Every login, every approval, every revocation. Compliance-ready.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">BIN</div>
+                    <h3>Single Binary</h3>
+                    <p>Server and agent in one executable. All assets embedded. No runtime dependencies. Air-gap ready.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">REV</div>
+                    <h3>Instant Revocation</h3>
+                    <p>Terminate sessions immediately from the dashboard. No waiting for token expiry. True Zero Trust.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="section section-alt">
+        <div class="container">
+            <div class="section-header">
+                <h2>How Zylock Works</h2>
+                <p>From login to connection in five steps. No shared credentials. No credential files.</p>
+            </div>
+            
+            <div class="arch-diagram">
+                <div class="arch-flow">
+                    <div class="arch-box user">
+                        <strong>User + Device</strong>
+                        <div class="arch-label">SSO Login</div>
+                    </div>
+                    <div class="arch-arrow">→</div>
+                    <div class="arch-box zylock">
+                        <strong>Zylock Server</strong>
+                        <div class="arch-label">Identity + Audit</div>
+                    </div>
+                    <div class="arch-arrow">→</div>
+                    <div class="arch-box resource">
+                        <strong>Internal Resources</strong>
+                        <div class="arch-label">File Servers, Apps, SSH</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>User logs in with SSO</h4>
+                        <p>Google, Microsoft, Okta — any OIDC provider. MFA enforced by your IdP.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>Admin approves the user</h4>
+                        <p>New users appear in dashboard. One-click approval with full audit trail.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>User enrolls their device</h4>
+                        <p>Receives mTLS certificate and WireGuard keys. Device identity is cryptographically bound.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>Device connects via WireGuard</h4>
+                        <p>Kernel-space tunnel established. Every heartbeat is mutually authenticated.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h4>Admin has full visibility</h4>
+                        <p>See who's connected, from where, when. Revoke access instantly if needed.</p>
                     </div>
                 </div>
             </div>
         </div>
-    </nav>
+    </section>
 
-    <!-- Hero Section -->
-    <section class="pt-32 pb-20 px-4 text-center">
-        <div class="max-w-4xl mx-auto">
-            <div class="inline-block px-3 py-1 mb-6 text-xs font-semibold tracking-wider text-brand-accent uppercase bg-slate-800 rounded-full border border-slate-700">
-                v1.0 Now Available
+    <!-- Pricing -->
+    <section id="pricing" class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Simple, Transparent Pricing</h2>
+                <p>No per-seat fees. No usage limits. No surprises.</p>
             </div>
-            <h1 class="text-5xl md:text-7xl font-bold text-white mb-6 tracking-tight">
-                Stop Trusting IPs.<br>
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-accent to-blue-600 glow-text">Start Trusting Identities.</span>
-            </h1>
-            <p class="mt-4 text-xl text-slate-400 max-w-2xl mx-auto">
-                Zylock is the self-hosted VPN replacement that knows <strong>who</strong> is connecting, not just <strong>what</strong>. Single binary. WireGuard speed. SOC2-ready visibility.
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <div class="pricing-name">Community Edition</div>
+                        <div class="pricing-price">Free</div>
+                        <div class="pricing-desc">For evaluation and non-critical deployments</div>
+                    </div>
+                    <ul class="pricing-features">
+                        <li>OIDC authentication (any provider)</li>
+                        <li>JIT provisioning + admin approval</li>
+                        <li>mTLS device authentication</li>
+                        <li>WireGuard VPN tunneling</li>
+                        <li>Audit logging (14-day retention)</li>
+                        <li>Device enrollment and management</li>
+                        <li>Full security hardening</li>
+                    </ul>
+                </div>
+                <div class="pricing-card featured">
+                    <div class="pricing-header">
+                        <div class="pricing-name">Commercial License</div>
+                        <div class="pricing-price">$4,000<span>/year</span></div>
+                        <div class="pricing-desc">For production deployments</div>
+                    </div>
+                    <ul class="pricing-features">
+                        <li>Everything in Community, plus:</li>
+                        <li>Extended audit retention (3-24 months)</li>
+                        <li>Audit log export (CSV/JSON)</li>
+                        <li>RBAC (Admin/Operator/Viewer)</li>
+                        <li>Break-glass recovery</li>
+                        <li>Backup/restore primitives</li>
+                        <li>Policy engine (resource-level access)</li>
+                        <li>CRL/certificate revocation lists</li>
+                        <li>Device posture signals</li>
+                        <li>Priority support</li>
+                    </ul>
+                </div>
+            </div>
+            <p class="pricing-note">
+                Community Edition is not a trial — it's a fully functional, secure product.<br>
+                Commercial License adds compliance and operational features for production use.
             </p>
-            <div class="mt-10 flex justify-center gap-4">
-                <a href="https://github.com/Nir-Agiv/zylock" class="px-8 py-3 bg-brand-accent text-brand-dark font-bold rounded-lg hover:bg-white transition shadow-[0_0_20px_rgba(56,189,248,0.3)]">
-                    Download Binary
-                </a>
-                <a href="#how-it-works" class="px-8 py-3 bg-slate-800 text-white font-semibold rounded-lg hover:bg-slate-700 border border-slate-600 transition">
-                    How It Works
-                </a>
-            </div>
-            <div class="mt-12 text-sm text-slate-500 font-mono">
-                <span class="mx-2">✓ Linux Server</span>
-                <span class="mx-2">✓ Windows Client</span>
-                <span class="mx-2">✓ OIDC Ready</span>
-            </div>
         </div>
     </section>
 
-    <!-- Value Prop Grid -->
-    <section id="features" class="py-20 bg-slate-900">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <!-- Card 1 -->
-                <div class="glass p-8 rounded-2xl hover:border-brand-accent/50 transition duration-300">
-                    <div class="text-brand-accent text-3xl mb-4">🛡️</div>
-                    <h3 class="text-xl font-bold text-white mb-2">Identity-First Security</h3>
-                    <p class="text-slate-400">Replace shared keys with OIDC/SSO (Google, Okta, Azure). Approve users via admin dashboard before they connect.</p>
-                </div>
-                <!-- Card 2 -->
-                <div class="glass p-8 rounded-2xl hover:border-brand-accent/50 transition duration-300">
-                    <div class="text-brand-accent text-3xl mb-4">⚡</div>
-                    <h3 class="text-xl font-bold text-white mb-2">WireGuard Speed</h3>
-                    <p class="text-slate-400">Modern kernel-space cryptography. High throughput, low latency, and resistant to network scanning.</p>
-                </div>
-                <!-- Card 3 -->
-                <div class="glass p-8 rounded-2xl hover:border-brand-accent/50 transition duration-300">
-                    <div class="text-brand-accent text-3xl mb-4">👁️</div>
-                    <h3 class="text-xl font-bold text-white mb-2">Audit & Compliance</h3>
-                    <p class="text-slate-400">Immutable append-only logs. Know exactly who accessed what, when they logged in, and when they were revoked.</p>
-                </div>
+    <!-- Comparison Table -->
+    <section class="section section-alt">
+        <div class="container">
+            <div class="section-header">
+                <h2>Why Zylock?</h2>
+                <p>How Zylock compares to other approaches.</p>
             </div>
-        </div>
-    </section>
-
-    <!-- Architecture/How It Works -->
-    <section id="how-it-works" class="py-20">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16">
-                <h2 class="text-3xl font-bold text-white">Traditional VPN vs. Zylock</h2>
-                <p class="mt-4 text-slate-400">The "Bouncer" for your private network.</p>
-            </div>
-            
-            <div class="relative">
-                <div class="absolute inset-0 flex items-center" aria-hidden="true">
-                    <div class="w-full border-t border-slate-700"></div>
-                </div>
-            </div>
-
-            <div class="mt-12 grid grid-cols-1 gap-8 md:grid-cols-2">
-                <!-- Old Way -->
-                <div class="bg-red-900/10 border border-red-900/30 p-6 rounded-xl">
-                    <h3 class="text-red-400 font-bold text-lg mb-2">❌ Legacy VPN</h3>
-                    <ul class="space-y-3 text-slate-400">
-                        <li class="flex items-start"><span class="mr-2">⚠</span> "Here is a key, you are now trusted forever."</li>
-                        <li class="flex items-start"><span class="mr-2">⚠</span> Logs show IP addresses, not names.</li>
-                        <li class="flex items-start"><span class="mr-2">⚠</span> Revocation is manual and difficult.</li>
-                    </ul>
-                </div>
-
-                <!-- Zylock Way -->
-                <div class="bg-green-900/10 border border-green-900/30 p-6 rounded-xl">
-                    <h3 class="text-brand-success font-bold text-lg mb-2">✅ The Zylock Way</h3>
-                    <ul class="space-y-3 text-slate-300">
-                        <li class="flex items-start"><span class="mr-2 text-brand-success">✓</span> User logs in via SSO (MFA enforced by IDP).</li>
-                        <li class="flex items-start"><span class="mr-2 text-brand-success">✓</span> Device authenticates via mTLS certificates.</li>
-                        <li class="flex items-start"><span class="mr-2 text-brand-success">✓</span> Admin can kill sessions instantly.</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </section>
-
-<!-- Comparison Table -->
-    <section id="comparison" class="py-24 bg-slate-900 border-t border-slate-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16">
-                <h2 class="text-3xl font-bold text-white">Choose Your Architecture</h2>
-                <p class="mt-4 text-slate-400">Why teams are moving away from both SaaS rental and legacy hardware.</p>
-            </div>
-
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse min-w-[800px]">
+            <div class="table-wrapper">
+                <table>
                     <thead>
                         <tr>
-                            <th class="p-6 border-b border-slate-700 w-1/4"></th>
-                            <!-- Zylock Column (Highlighted) -->
-                            <th class="p-6 border-b border-brand-accent/30 bg-brand-accent/5 rounded-t-xl w-1/4 relative">
-                                <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand-accent text-brand-dark text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                                    Your Choice
-                                </div>
-                                <div class="text-2xl font-bold text-white">Zylock</div>
-                                <div class="text-sm text-brand-accent mt-1">Modern Self-Hosted</div>
-                            </th>
-                            <!-- SaaS Column -->
-                            <th class="p-6 border-b border-slate-700 w-1/4">
-                                <div class="text-xl font-semibold text-slate-300">SaaS ZTNA</div>
-                                <div class="text-sm text-slate-500 mt-1">Vendor Cloud</div>
-                            </th>
-                            <!-- Legacy Column -->
-                            <th class="p-6 border-b border-slate-700 w-1/4">
-                                <div class="text-xl font-semibold text-slate-300">Legacy VPN</div>
-                                <div class="text-sm text-slate-500 mt-1">The "Castle" Model</div>
-                            </th>
+                            <th>Capability</th>
+                            <th class="highlight-col">Zylock</th>
+                            <th>Tailscale</th>
+                            <th>OpenVPN</th>
+                            <th>Traditional VPN</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-800">
-                        <!-- Row 1: Data Sovereignty -->
+                    <tbody>
                         <tr>
-                            <td class="p-6 text-slate-400 font-medium">Control Plane Location</td>
-                            <td class="p-6 bg-brand-accent/5 border-x border-brand-accent/10 text-white font-semibold">
-                                🏠 Your Server
-                                <div class="text-xs text-slate-400 font-normal mt-1">100% Data Ownership</div>
-                            </td>
-                            <td class="p-6 text-slate-400">
-                                ☁️ Vendor Cloud
-                                <div class="text-xs text-slate-600 mt-1">Metadata leaks externally</div>
-                            </td>
-                            <td class="p-6 text-slate-400">
-                                🏢 On-Prem
-                                <div class="text-xs text-slate-600 mt-1">Requires heavy appliances</div>
-                            </td>
+                            <td>Self-hosted</td>
+                            <td class="highlight-col"><span class="check">✓ 100%</span></td>
+                            <td><span class="cross">✕ Coordination server</span></td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="check">✓</span></td>
                         </tr>
-
-                        <!-- Row 2: Identity -->
                         <tr>
-                            <td class="p-6 text-slate-400 font-medium">Authentication</td>
-                            <td class="p-6 bg-brand-accent/5 border-x border-brand-accent/10 text-brand-success font-semibold">
-                                ✅ OIDC / SSO
-                            </td>
-                            <td class="p-6 text-slate-300">
-                                ✅ OIDC / SSO
-                            </td>
-                            <td class="p-6 text-slate-500">
-                                ❌ LDAP / Shared Keys
-                            </td>
+                            <td>Identity/SSO</td>
+                            <td class="highlight-col"><span class="check">✓ Any OIDC</span></td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="cross">✕ Certs only</span></td>
+                            <td><span class="cross">✕ Shared keys</span></td>
                         </tr>
-
-                        <!-- Row 3: Deployment -->
                         <tr>
-                            <td class="p-6 text-slate-400 font-medium">Installation</td>
-                            <td class="p-6 bg-brand-accent/5 border-x border-brand-accent/10 text-white">
-                                <span class="border-b border-dotted border-slate-500 cursor-help" title="Go binary with embedded assets">Single Binary</span>
-                            </td>
-                            <td class="p-6 text-slate-400">
-                                Agent + Cloud Acct
-                            </td>
-                            <td class="p-6 text-slate-500">
-                                Complex Appliance
-                            </td>
+                            <td>Audit trail</td>
+                            <td class="highlight-col"><span class="check">✓ Built-in</span></td>
+                            <td><span class="check">✓ Enterprise</span></td>
+                            <td><span class="cross">✕ Manual</span></td>
+                            <td><span class="cross">✕</span></td>
                         </tr>
-
-                        <!-- Row 4: Visibility -->
                         <tr>
-                            <td class="p-6 text-slate-400 font-medium">Audit Visibility</td>
-                            <td class="p-6 bg-brand-accent/5 border-x border-brand-accent/10 text-white">
-                                User + Device + IP
-                            </td>
-                            <td class="p-6 text-slate-400">
-                                User + IP
-                            </td>
-                            <td class="p-6 text-slate-500">
-                                IP Only (Blind)
-                            </td>
+                            <td>Protocol</td>
+                            <td class="highlight-col">WireGuard</td>
+                            <td>WireGuard</td>
+                            <td>OpenVPN</td>
+                            <td>IPsec</td>
                         </tr>
-
-                        <!-- Row 5: Protocol/Speed -->
                         <tr>
-                            <td class="p-6 text-slate-400 font-medium">Protocol</td>
-                            <td class="p-6 bg-brand-accent/5 border-x border-brand-accent/10 text-white rounded-b-xl border-b border-brand-accent/30">
-                                ⚡ WireGuard
-                            </td>
-                            <td class="p-6 text-slate-400">
-                                ⚡ WireGuard / Proprietary
-                            </td>
-                            <td class="p-6 text-slate-500">
-                                🐌 IPsec / OpenVPN
-                            </td>
+                            <td>Deployment</td>
+                            <td class="highlight-col">Single binary</td>
+                            <td>Agent + SaaS</td>
+                            <td>Complex</td>
+                            <td>Appliance</td>
+                        </tr>
+                        <tr>
+                            <td>Air-gap ready</td>
+                            <td class="highlight-col"><span class="check">✓</span></td>
+                            <td><span class="cross">✕</span></td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="check">✓</span></td>
+                        </tr>
+                        <tr>
+                            <td>Instant revocation</td>
+                            <td class="highlight-col"><span class="check">✓</span></td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="cross">✕</span></td>
+                            <td><span class="cross">✕</span></td>
                         </tr>
                     </tbody>
                 </table>
             </div>
+        </div>
+    </section>
 
-            <!-- DIY Callout -->
-            <div class="mt-8 text-center">
-                <p class="text-slate-500 text-sm">
-                    <strong>Thinking about DIY Open Source?</strong> Raw WireGuard is fast, but managing keys and config files for a whole team is a nightmare. Zylock gives you the UI and SSO you're missing.
-                </p>
+    <!-- Security Highlights -->
+    <section class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Security by Design</h2>
+                <p>Assume failure. Design around it.</p>
+            </div>
+            <div class="security-grid">
+                <div class="security-item">
+                    <strong>Transport</strong>
+                    TLS 1.3 enforced, HSTS, strict CSP
+                </div>
+                <div class="security-item">
+                    <strong>Data at Rest</strong>
+                    AES-256-GCM encryption
+                </div>
+                <div class="security-item">
+                    <strong>Authentication</strong>
+                    Bcrypt hashing, CSRF protection
+                </div>
+                <div class="security-item">
+                    <strong>Sessions</strong>
+                    Short-lived tokens, immediate revocation
+                </div>
+                <div class="security-item">
+                    <strong>Certificates</strong>
+                    Server-controlled CN, CA pinning
+                </div>
+                <div class="security-item">
+                    <strong>Rate Limiting</strong>
+                    5 req/min per IP on auth endpoints
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Roadmap Section -->
-    <section class="py-20 border-t border-slate-800 relative overflow-hidden">
-        <!-- Background decorative glow -->
-        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-4xl opacity-10 pointer-events-none">
-            <div class="absolute inset-0 bg-gradient-to-b from-brand-accent to-transparent blur-3xl"></div>
-        </div>
-
-        <div class="max-w-4xl mx-auto px-4 relative z-10">
-            <div class="text-center mb-16">
-                <div class="inline-block px-3 py-1 mb-4 text-xs font-semibold tracking-wider text-brand-success uppercase bg-green-900/20 rounded-full border border-green-900/50">
-                    Active Development
-                </div>
-                <h2 class="text-3xl font-bold text-white">The Trajectory</h2>
-                <p class="mt-4 text-slate-400">
-                    We are building a system engineers trust even when it's quiet. <br>
-                    Here is what ships next.
-                </p>
+    <!-- Getting Started -->
+    <section id="quickstart" class="section section-alt">
+        <div class="container">
+            <div class="section-header">
+                <h2>Get Started in Minutes</h2>
+                <p>Single binary deployment. No containers. No orchestration.</p>
             </div>
+            <div class="quickstart">
+                <h3>1. Prerequisites</h3>
+                <ul style="list-style: disc; margin-left: 1.5rem; margin-bottom: 1rem;">
+                    <li><strong>Server:</strong> Linux with root access</li>
+                    <li><strong>Ports:</strong> UDP 51820 (VPN), TCP 8443 (HTTPS)</li>
+                    <li><strong>Optional:</strong> OIDC provider credentials (Google, Microsoft, Okta)</li>
+                </ul>
 
-            <div class="space-y-8">
-                <!-- Milestone 1: UP NEXT -->
-                <div class="flex flex-col md:flex-row gap-6 md:gap-12 items-start opacity-100">
-                    <div class="md:w-32 flex-shrink-0 pt-2 text-brand-accent font-mono font-bold text-right">
-                        Q1 2026
-                    </div>
-                    <div class="flex-1 bg-slate-800/50 border border-slate-700 p-6 rounded-xl relative">
-                        <div class="absolute top-6 -left-2 md:-left-14 w-4 h-4 rounded-full bg-brand-accent shadow-[0_0_10px_#38bdf8]"></div>
-                        <h3 class="text-xl font-bold text-white mb-2">Governance & Granularity</h3>
-                        <ul class="space-y-2 text-slate-400 text-sm">
-                            <li class="flex items-center">
-                                <span class="text-brand-accent mr-2">➜</span>
-                                <strong>Resource-Level Policies:</strong> Define access rules per service/network (Prod vs. Staging).
-                            </li>
-                            <li class="flex items-center">
-                                <span class="text-brand-accent mr-2">➜</span>
-                                <strong>RBAC:</strong> Scoped permissions for Admins, Operators, and Viewers.
-                            </li>
-                        </ul>
-                    </div>
+                <h3>2. Download and Initialize</h3>
+                <div class="code-block">
+<pre><span class="comment"># Download the latest release</span>
+<span class="command">curl</span> -LO https://github.com/zylock-security/zylock/releases/latest/download/zylock-linux
+
+<span class="comment"># Make executable</span>
+<span class="command">chmod</span> +x zylock-linux
+
+<span class="comment"># Initialize the server (interactive wizard)</span>
+<span class="command">sudo</span> ./zylock-linux server init</pre>
+                </div>
+                <p>The wizard will prompt for master key, admin credentials, and OIDC configuration.</p>
+
+                <h3>3. Start the Server</h3>
+                <div class="code-block">
+<pre><span class="command">sudo</span> ./zylock-linux server
+
+<span class="comment"># Dashboard available at https://your-server:8443</span></pre>
                 </div>
 
-                <!-- Milestone 2: SOON -->
-                <div class="flex flex-col md:flex-row gap-6 md:gap-12 items-start opacity-75">
-                    <div class="md:w-32 flex-shrink-0 pt-2 text-slate-500 font-mono font-bold text-right">
-                        Q2 2026
-                    </div>
-                    <div class="flex-1 bg-slate-900/50 border border-slate-800 p-6 rounded-xl relative">
-                        <div class="absolute top-6 -left-2 md:-left-14 w-4 h-4 rounded-full bg-slate-700 border border-slate-600"></div>
-                        <h3 class="text-xl font-bold text-slate-200 mb-2">Operational Resilience</h3>
-                        <ul class="space-y-2 text-slate-500 text-sm">
-                            <li class="flex items-center">
-                                <span class="text-slate-600 mr-2">➜</span>
-                                <strong>Break-Glass Mode:</strong> Time-limited, auditable overrides for emergency outages.
-                            </li>
-                            <li class="flex items-center">
-                                <span class="text-slate-600 mr-2">➜</span>
-                                <strong>Device Trust Signals:</strong> Gate access based on OS version and disk encryption status.
-                            </li>
-                        </ul>
-                    </div>
+                <h3>4. Connect a Client</h3>
+                <div class="code-block">
+<pre><span class="comment"># On Windows client</span>
+.\zylock.exe connect login <span class="string">--server</span> https://vpn.yourcompany.com:8443 \
+    <span class="string">--ca-cert</span> .\zylock-ca.pem \
+    <span class="string">--ca-fingerprint</span> &lt;SHA256&gt;
+
+<span class="comment"># Browser opens for SSO login</span>
+<span class="comment"># Paste enrollment token when prompted</span>
+<span class="comment"># VPN tunnel established automatically</span></pre>
                 </div>
-            </div>
-            
-            <div class="mt-12 text-center">
-                <p class="text-slate-600 text-sm italic">
-                    "Zylock avoids features that increase complexity without strategic payoff. No AI gimmicks. No alert fatigue."
-                </p>
+
+                <h3>5. Optional: Install as Service</h3>
+                <div class="code-block">
+<pre><span class="comment"># Make connection persistent across reboots</span>
+.\zylock.exe connect service install
+.\zylock.exe connect service start</pre>
+                </div>
+
+                <div style="margin-top: 2rem; text-align: center;">
+                    <a href="https://github.com/zylock-security/zylock" class="btn btn-primary">View Full Documentation</a>
+                    <a href="https://github.com/zylock-security/zylock/releases" class="btn btn-secondary" style="margin-left: 1rem;">Download Latest Release</a>
+                </div>
             </div>
         </div>
     </section>
-    
+
     <!-- Footer -->
-    <footer class="py-12 border-t border-slate-800 text-center">
-        <div class="mb-4">
-            <span class="text-2xl font-bold text-white tracking-tighter">ZYLOCK<span class="text-brand-accent">.</span></span>
+    <footer>
+        <div class="container">
+            <div class="logo">Zylock<span>.</span></div>
+            <p style="margin-top: 0.5rem;">Identity-aware secure remote access.</p>
+            <div class="footer-links">
+                <a href="https://github.com/zylock-security/zylock">GitHub</a>
+                <a href="https://github.com/zylock-security/zylock/wiki">Documentation</a>
+                <a href="mailto:support@zylock.dev">Support</a>
+                <a href="mailto:sales@zylock.dev">Licensing</a>
+            </div>
+            <p class="footer-copy">
+                &copy; 2025 Zylock Security. All rights reserved.<br>
+                Community Edition (Free) | Commercial License ($4,000/year)
+            </p>
         </div>
-        <p class="text-slate-500 mb-6">Secure Remote Access for the Modern Era.</p>
-        <div class="flex justify-center space-x-6 text-slate-400">
-            <a href="https://github.com/Nir-Agiv/zylock" class="hover:text-white">GitHub</a>
-            <a href="#" class="hover:text-white">Documentation</a>
-            <a href="mailto:niragiv1@gmail.com" class="hover:text-white">Contact</a>
-        </div>
-        <p class="mt-8 text-xs text-slate-600">© 2025 Zylock Security. All rights reserved.</p>
     </footer>
-
 </body>
 </html>
